@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TicketYa ® - Boletos Oficiales</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0f172a"/>
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <script src="https://cdn.lottiefiles.com/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #e2b93b;
+      --text: #f9f8f8;
+      --gray: #fffdfd;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x:hidden; }
+
+    /* HEADER + HAMBURGUESA */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(15,23,42,0.95);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      padding: 1.2rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .logo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      background: linear-gradient(90deg, #e2b93b, #f4d03f);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: 900;
+      letter-spacing: 3px;
+    }
+    nav { display: flex; gap: 2.5rem; }
+    nav a { color: white; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: 0.3s; }
+    nav a:hover { color: var(--accent); }
+    .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 6px; }
+    .hamburger span { width: 30px; height: 3px; background: rgb(0, 0, 0); border-radius: 3px; transition: 0.3s; }
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100vh;
+      background: #0f172a;
+      z-index: 999;
+      padding: 6rem 5%;
+      transition: left 0.4s ease;
+    }
+    .mobile-menu.active { left: 0; }
+    .mobile-menu a { display: block; color: white; font-size: 2rem; margin: 2rem 0; text-align: center; font-weight: 700; }
+    .mobile-menu a:hover { color: var(--accent); }
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(rgba(15,23,42,0.9), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=1600') center/cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 5%;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(4rem, 12vw, 7rem);
+      background: linear-gradient(45deg, #e2b93b, #f4d03f);
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 50px rgba(226,185,59,0.6);
+    }
+    .hero p {
+      font-size: clamp(1.2rem, 4vw, 1.8rem);
+      margin: 2rem 0;
+      max-width: 800px;
+      opacity: 0.9;
+    }
+
+    section { padding: clamp(80px, 12vw, 120px) 5%; }
+    h2 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(3rem, 10vw, 5.5rem);
+      text-align: center;
+      margin-bottom: 4rem;
+      background: linear-gradient(90deg, #e2b93b, #f4d03f);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    /* CARRUSEL */
+    .swiper { width: 100%; padding: 40px 0; }
+    .swiper-slide {
+      background: var(--card);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      transition: 0.4s;
+    }
+    .swiper-slide:hover { transform: translateY(-15px); }
+    .swiper-slide img { width: 100%; height: clamp(220px, 40vw, 300px); object-fit: cover; }
+    .event-info { padding: 2rem; text-align: center; }
+    .event-info h3 { font-size: clamp(1.5rem, 5vw, 2rem); margin: 1rem 0; color: var(--accent); }
+    .event-info p { color: var(--gray); margin-bottom: 1.5rem; }
+    .buy-btn {
+      background: linear-gradient(45deg, #e2b93b, #f4d03f);
+      color: black;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .buy-btn:hover { transform: scale(1.08); box-shadow: 0 15px 40px rgba(226,185,59,0.5); }
+
+    .how-it-works { background: #001d3d; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .step {
+      background: rgba(226,185,59,0.08);
+      padding: 3rem 2rem;
+      border-radius: 24px;
+      border: 2px solid rgba(226,185,59,0.2);
+    }
+    .step h3 { color: var(--accent); font-size: 1.8rem; margin: 1.5rem 0; }
+
+    .buy-section { background: linear-gradient(135deg, #0f172a, #001d3d); }
+    .form-card {
+      background: rgba(30,41,59,0.7);
+      backdrop-filter: blur(20px);
+      border-radius: 35px;
+      padding: clamp(2.5rem, 6vw, 4.5rem);
+      max-width: 650px;
+      margin: 0 auto;
+      border: 2px solid rgba(226,185,59,0.2);
+      box-shadow: 0 25px 70px rgba(0,0,0,0.8);
+    }
+    input, select {
+      width: 100%;
+      padding: 18px;
+      margin: 15px 0;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(226,185,59,0.3);
+      border-radius: 18px;
+      color: white;
+      font-size: 1.2rem;
+    }
+    .generate-btn {
+      width: 100%;
+      padding: 22px;
+      background: linear-gradient(45deg, #e2b93b, #f4d03f);
+      color: black;
+      border: none;
+      border-radius: 18px;
+      font-size: 1.7rem;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 25px;
+      transition: 0.4s;
+    }
+    .generate-btn:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(226,185,59,0.6); }
+
+    /* BOLETO */
+    #ticket {
+      margin: 5rem auto;
+      padding: 3rem;
+      background: linear-gradient(135deg, #001d3d, #0f172a);
+      border-radius: 40px;
+      display: none;
+      max-width: 950px;
+      box-shadow: 0 40px 100px rgba(226,185,59,0.15);
+      overflow: visible !important;
+    }
+    .ticket-inner {
+      background: white;
+      color: black;
+      border-radius: 35px;
+      padding: clamp(3rem, 8vw, 5rem);
+      text-align: center;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+    }
+    .ticket-header {
+      background: linear-gradient(90deg, #001d3d, #003566);
+      color: white;
+      padding: 3.5rem;
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-family: 'Bebas Neue', cursive;
+      letter-spacing: 6px;
+      border-radius: 30px 30px 0 0;
+    }
+    .ticket-body {
+      padding: 4rem 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3.5rem;
+      background: #f8fafc;
+      border-radius: 0 0 30px 30px;
+    }
+    @media (min-width: 768px) {
+      .ticket-body { flex-direction: row; justify-content: space-between; text-align: left; }
+    }
+    .ticket-info h2 { font-size: clamp(2.3rem, 7vw, 4rem); color: #001d3d; margin: 1.5rem 0; font-weight: 900; }
+    .ticket-info p { font-size: clamp(1.2rem, 4vw, 1.6rem); margin: 1.2rem 0; color: #001d3d; font-weight: 600; }
+    .qr-container { min-width: 280px; text-align: center; padding: 1.5rem; }
+    #qrCode canvas { width: clamp(200px, 50vw, 260px) !important; height: clamp(200px, 50vw, 260px) !important; border: 20px solid white !important; border-radius: 20px !important; box-shadow: 0 15px 40px rgba(0,0,0,0.7); background: white; }
+    .download-btn {
+      margin-top: 4rem;
+      padding: 20px 70px;
+      background: linear-gradient(45deg, #e2b93b, #f4d03f);
+      color: black;
+      border: none;
+      border-radius: 60px;
+      font-size: 1.6rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 20px 50px rgba(226,185,59,0.6);
+      transition: 0.4s;
+    }
+    .download-btn:hover { transform: translateY(-10px); box-shadow: 0 30px 70px rgba(226,185,59,0.8); }
+
+    /* BOTÓN PWA */
+    #installBtn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: linear-gradient(45deg, #e2b93b, #f4d03f);
+      color: black;
+      padding: 18px 30px;
+      border: none;
+      border-radius: 60px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 15px 40px rgba(226,185,59,0.7);
+      z-index: 999;
+      display: none;
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(226,185,59,0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(226,185,59,0); }
+      100% { box-shadow: 0 0 0 0 rgba(226,185,59,0); }
+    }
+
+    /* FAQ NUEVA Y ELEGANTE */
+    .faq-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1.5rem;
+    }
+    .faq-item {
+      background: rgba(30, 41, 59, 0.7);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(226,185,59,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      transition: all 0.4s ease;
+    }
+    .faq-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-5px);
+    }
+    .faq-question {
+      padding: 1.8rem 2rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.25rem;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(226,185,59,0.15), transparent);
+      transition: all 0.3s;
+    }
+    .faq-question::after {
+      content: '+';
+      font-size: 2.5rem;
+      color: var(--accent);
+      font-weight: 300;
+      transition: transform 0.4s ease;
+    }
+    .faq-question.active::after {
+      content: '−';
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 2rem;
+      background: rgba(15,23,42,0.9);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+    .faq-answer.open {
+      max-height: 400px;
+      padding: 2rem;
+      border-top: 1px solid rgba(226,185,59,0.2);
+    }
+
+    .faq, .contact { background: #001d3d; }
+    footer {
+      background: #000;
+      padding: 4rem;
+      text-align: center;
+      color: var(--gray);
+      border-top: 1px solid #334155;
+    }
+
+    .welcome-page {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #001d3d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-card {
+      text-align: center;
+      background: rgba(30,41,59,0.6);
+      backdrop-filter: blur(30px);
+      padding: 5rem;
+      border-radius: 40px;
+      border: 3px solid rgba(226,185,59,0.3);
+    }
+    .welcome-card h1 {
+      font-size: clamp(4.5rem, 14vw, 8rem);
+      background: linear-gradient(45deg, #e2b93b, #f4d03f);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BOTÓN INSTALAR PWA -->
+  <button id="installBtn">Instalar App</button>
+
+  <!-- HAMBURGUESA -->
+  <div class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('active')">
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- MENU MÓVIL -->
+  <div class="mobile-menu">
+    <a href="#home">Inicio</a>
+    <a href="#events">Eventos</a>
+    <a href="#how">Cómo funciona</a>
+    <a href="#buy">Comprar</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contacto</a>
+  </div>
+
+  <header>
+    <div class="logo">TicketYa</div>
+    <nav>
+      <a href="#home">Inicio</a>
+      <a href="#events">Eventos</a>
+      <a href="#how">Cómo funciona</a>
+      <a href="#buy">Comprar</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contacto</a>
+    </nav>
+  </header>
+
+  <div class="hero" id="home">
+    <h1>TICKETYA</h1>
+    <p>Tu entrada oficial a los mejores eventos de México • 2025</p>
+    <button onclick="document.getElementById('events').scrollIntoView({behavior:'smooth'})" style="margin-top:3rem; padding:20px 50px; background:linear-gradient(45deg,#e2b93b,#f4d03f); color:black; border:none; border-radius:50px; font-size:1.5rem; font-weight:900;">
+      VER EVENTOS
+    </button>
+  </div>
+
+  <section class="events" id="events">
+    <h2>EVENTOS DESTACADOS</h2>
+    <div class="swiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <img src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800" alt="">
+          <div class="event-info">
+            <h3>Bad Bunny</h3>
+            <p>Estadio Azteca • 15 Dic</p>
+            <button class="buy-btn" onclick="preFillBuy('Bad Bunny - Estadio Azteca')">COMPRAR</button>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="https://images.milenio.com/KmZSx6Bv2eC8X9i5HGlhKdanEFQ=/942x532/uploads/media/2025/05/13/el-tecate-emblema-ha-dado.jpg?w=800" alt="">
+          <div class="event-info">
+            <h3>Tecate Emblema</h3>
+            <p>Autódromo Hnos. Rodríguez</p>
+            <button class="buy-btn" onclick="preFillBuy('Tecate Emblema 2026')">COMPRAR</button>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="https://www.informador.mx/__export/1506080033434/sites/elinformador/img/historico/13/1197873.jpg_1970638775.jpg?w=800" alt="">
+          <div class="event-info">
+            <h3>Tomorrowland MX</h3>
+            <p>20 Ene 2026</p>
+            <button class="buy-btn" onclick="preFillBuy('Tomorrowland México 2026')">COMPRAR</button>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="https://www.hola.com/horizon/landscape/20dddfae05b6-luis-miguel.jpg?im=Resize=(960),type=downsize?w=800" alt="">
+          <div class="event-info">
+            <h3>Luis Miguel</h3>
+            <p>Auditorio Nacional</p>
+            <button class="buy-btn" onclick="preFillBuy('Luis Miguel Tour 2025')">COMPRAR</button>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+
+  <section class="how-it-works" id="how">
+    <h2>CÓMO FUNCIONA</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>1. Elige tu evento</h3>
+        <p>Explora y selecciona el concierto o festival que quieras vivir.</p>
+      </div>
+      <div class="step">
+        <h3>2. Completa tus datos</h3>
+        <p>Ingresa tu nombre y selecciona el evento.</p>
+      </div>
+      <div class="step">
+        <h3>3. Recibe tu boleto</h3>
+        <p>Genera tu boleto oficial con QR y descárgalo al instante.</p>
+      </div>
+      <div class="step">
+        <h3>4. ¡Disfruta!</h3>
+        <p>Presenta tu QR en la entrada y vive la experiencia.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="buy-section" id="buy">
+    <div class="form-card">
+      <h2>COMPRA TU BOLETO</h2>
+      <form id="buyForm">
+        <input type="text" id="name" placeholder="Nombre completo" required />
+        <select id="event" required>
+          <option value="" disabled selected>Selecciona el evento</option>
+          <option>Bad Bunny - Estadio Azteca</option>
+          <option>Tecate Emblema 2026</option>
+          <option>Tomorrowland México 2026</option>
+          <option>Luis Miguel Tour 2025</option>
+        </select>
+        <button type="button" class="generate-btn" onclick="generarBoleto()">
+          GENERAR BOLETO OFICIAL
+        </button>
+      </form>
+
+      <div id="ticket">
+        <div class="ticket-inner">
+          <div class="ticket-header">TICKETYA </div>
+          <div class="ticket-body">
+            <div class="ticket-info">
+              <h2 id="ticketName">Nombre</h2>
+              <p><strong>Evento:</strong> <span id="ticketEvent">Evento</span></p>
+              <p><strong>ID:</strong> <span id="ticketId">ID</span></p>
+              <p><strong>Fecha:</strong> <span id="ticketDate">Hoy</span></p>
+            </div>
+            <div class="qr-container" id="qrCode"></div>
+          </div>
+        </div>
+        <button onclick="descargarBoleto()" class="download-btn">
+          DESCARGAR BOLETO
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ MEJORADA -->
+  <section class="faq" id="faq">
+    <h2>PREGUNTAS FRECUENTES</h2>
+    <div class="faq-container">
+      <div class="faq-item">
+        <div class="faq-question active">¿Los boletos son oficiales?</div>
+        <div class="faq-answer open">Sí, 100% garantizados. Todos los boletos son emitidos directamente con los organizadores oficiales del evento.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">¿Puedo cambiar el nombre del boleto?</div>
+        <div class="faq-answer">No, por seguridad los boletos son personales e intransferibles una vez generados.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">¿Qué pasa si pierdo mi boleto?</div>
+        <div class="faq-answer">¡Tranquilo! Guarda tu código único (el ID del boleto). Con ese código puedes regenerar tu boleto cuando quieras desde nuestro validador.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">¿Puedo usar el boleto desde mi celular?</div>
+        <div class="faq-answer">¡Claro! El QR funciona perfectamente desde la pantalla del móvil. También puedes instalar la app para acceso más rápido.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">¿Hay reembolsos?</div>
+        <div class="faq-answer">Depende del evento. Consulta las políticas del organizador en la descripción del evento.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <h2>CONTÁCTANOS</h2>
+    <form class="contact-form">
+      <input type="text" placeholder="Tu nombre" required />
+      <input type="email" placeholder="Tu correo" required />
+      <textarea placeholder="Tu mensaje" rows="5" required></textarea>
+      <button type="submit" class="generate-btn">ENVIAR MENSAJE</button>
+    </form>
+  </section>
+
+  <div id="validationPage" style="display:none" class="welcome-page">
+    <div id="particles-js"></div>
+    <div class="welcome-card">
+      <div id="lottie-animation"></div>
+      <h1 id="welcomeText">Validando...</h1>
+      <p id="detailText">Un momento...</p>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 TicketYa ® • Todos los derechos reservados<br>
+    contacto@ticketya.com • +52 55 1234 5678
+  </footer>
+
+  <!-- LIBRERÍAS -->
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    // === CONFIGURACIÓN FIREBASE ===
+    const firebaseConfig = { databaseURL: "https://ticketpro-1723d-default-rtdb.firebaseio.com" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // === VALIDACIÓN DE BOLETO CON ?t=ID ===
+    const urlParams = new URLSearchParams(window.location.search);
+    const ticketId = urlParams.get('t');
+    if (ticketId) {
+      document.querySelector('header').style.display = 'none';
+      document.querySelector('.hero').style.display = 'none';
+      document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+      document.querySelector('footer').style.display = 'none';
+      document.getElementById('validationPage').style.display = 'flex';
+      particlesJS("particles-js", { particles: { number: { value: 200 }, color: { value: "#e2b93b" }, size: { value: 4 } } });
+      validarConLottie(ticketId);
+    }
+
+    async function validarConLottie(id) {
+      const anim = document.getElementById('lottie-animation');
+      const h1 = document.getElementById('welcomeText');
+      const p = document.getElementById('detailText');
+
+      const snap = await db.ref('tickets/' + id).once('value');
+      const data = snap.val();
+
+      if (!data) {
+        anim.innerHTML = `<lottie-player src="https://assets1.lottiefiles.com/packages/lf20_jwlppooi.json" background="transparent" speed="1" style="width:300px;height:300px" loop autoplay></lottie-player>`;
+        h1.textContent = "INVÁLIDO";
+        p.textContent = "Boleto no encontrado";
+        return;
+      }
+
+      if (data.scanned) {
+        anim.innerHTML = `<lottie-player src="https://assets5.lottiefiles.com/packages/lf20_pjsxm3c4.json" background="transparent" speed="1" style="width:300px;height:300px" loop autoplay></lottie-player>`;
+        h1.textContent = "YA USADO";
+        p.textContent = `Validado: ${new Date(data.scanTime).toLocaleString('es-MX')}`;
+      } else {
+        await db.ref('tickets/' + id).update({ scanned: true, scanTime: new Date().toISOString() });
+        anim.innerHTML = `<lottie-player src="https://assets10.lottiefiles.com/packages/lf20_0yfsb3kt.json" background="transparent" speed="1" style="width:400px;height:400px" autoplay></lottie-player>`;
+        h1.textContent = "BIENVENIDO";
+        p.innerHTML = `<strong>${data.name}</strong><br>${data.event}`;
+        new Audio('https://assets.mixkit.co/sfx/preview/mixkit-confirmation-tone-2870.mp3').play();
+      }
+    }
+
+    function preFillBuy(eventName) {
+      document.getElementById('event').value = eventName;
+      document.getElementById('name').focus();
+      document.getElementById('buy').scrollIntoView({behavior: 'smooth'});
+    }
+
+    async function generarBoleto() {
+      const name = document.getElementById('name').value.trim();
+      const event = document.getElementById('event').value;
+      if (!name || !event) return alert('Completa todos los campos');
+
+      const ticketId = "TYA" + Date.now().toString(36).toUpperCase();
+      await db.ref('tickets/' + ticketId).set({ name, event, scanned: false, scanTime: null });
+
+      const url = location.href.split('?')[0] + '?t=' + ticketId;
+
+      document.getElementById('ticketName').textContent = name;
+      document.getElementById('ticketEvent').textContent = event;
+      document.getElementById('ticketId').textContent = ticketId;
+      document.getElementById('ticketDate').textContent = new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.getElementById('qrCode').innerHTML = '';
+      new QRCode(document.getElementById('qrCode'), {
+        text: url,
+        width: 240,
+        height: 240,
+        colorDark: "#001d3d",
+        colorLight: "#ffffff"
+      });
+
+      document.getElementById('ticket').style.display = 'block';
+      window.currentTicketId = ticketId;
+
+      setTimeout(descargarBoleto, 2500);
+    }
+
+    function descargarBoleto() {
+      html2canvas(document.querySelector('.ticket-inner'), {
+        scale: 2.5,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 1000,
+        height: 1400,
+        logging: false
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `TicketYa_${window.currentTicketId}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+
+    // === FAQ ACORDEÓN ===
+    document.querySelectorAll('.faq-question').forEach(item => {
+      item.addEventListener('click', () => {
+        const answer = item.nextElementSibling;
+        const isOpen = answer.classList.contains('open');
+
+        // Cerrar todos
+        document.querySelectorAll('.faq-answer').forEach(a => {
+          a.classList.remove('open');
+          a.previousElementSibling.classList.remove('active');
+        });
+
+        // Abrir el actual si no estaba abierto
+        if (!isOpen) {
+          answer.classList.add('open');
+          item.classList.add('active');
+        }
+      });
+    });
+
+    // === PWA ===
+// === PWA - BOTÓN INSTALAR 100% FUNCIONAL (2025) ===
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+// Forzar que el botón aparezca después de 8 segundos aunque no dispare el evento
+setTimeout(() => {
+  if (!deferredPrompt) {
+    installBtn.style.display = 'block';
+    installBtn.textContent = 'Instalar App';
+  }
+}, 8000);
+
+// Evento oficial (el bueno)
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('Evento beforeinstallprompt disparado');
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = 'block';
+  installBtn.textContent = 'Instalar App';
+});
+
+// Cuando el usuario haga clic
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) {
+    // Si por alguna razón no se capturó el evento, forzamos el diálogo nativo
+    alert('Para instalar: abre el menú de Chrome (⋮) → "Instalar aplicación" o "Agregar a pantalla de inicio"');
+    return;
+  }
+
+  installBtn.style.display = 'none';
+  deferredPrompt.prompt();
+  
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    console.log('Usuario instaló la app');
+  } else {
+    console.log('Usuario rechazó instalar');
+    installBtn.style.display = 'block'; // vuelve a aparecer si rechaza
+  }
+  deferredPrompt = null;
+});
+
+// Opcional: ocultar el botón cuando ya está instalada
+window.addEventListener('appinstalled', () => {
+  installBtn.style.display = 'none';
+  console.log('PWA instalada con éxito');
+});
+
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registrado'))
+          .catch(err => console.log('Error SW:', err));
+      });
+    }
+
+    // Carrusel
+    new Swiper('.swiper', {
+      loop: true,
+      slidesPerView: 1.2,
+      spaceBetween: 20,
+      centeredSlides: true,
+      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+      pagination: { el: '.swiper-pagination', clickable: true },
+      breakpoints: {
+        640: { slidesPerView: 2 },
+        968: { slidesPerView: 3 }
+      }
+    });
+  </script>
+</body>
+</html>
